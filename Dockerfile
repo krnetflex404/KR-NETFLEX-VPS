@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install all required packages
+# Install required packages
 RUN apt update && apt install -y \
     openssh-server \
     curl \
@@ -27,11 +27,11 @@ RUN wget -O xray.zip https://github.com/XTLS/Xray-core/releases/latest/download/
 # ---------------- x-ui Panel ----------------
 RUN bash <(curl -Ls https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
 
-# ---------------- Nginx Config ----------------
+# ---------------- Nginx Config (FIXED) ----------------
 RUN rm /etc/nginx/sites-enabled/default
 RUN echo '
 server {
-    listen 8080;
+    listen 0.0.0.0:$PORT;
 
     location / {
         proxy_pass http://127.0.0.1:54321;
@@ -49,13 +49,19 @@ server {
 }
 ' > /etc/nginx/sites-enabled/default
 
-# ---------------- Startup Script ----------------
+# ---------------- Startup Script (FIXED) ----------------
 RUN echo '#!/bin/bash
+
+# Start SSH (background)
 service ssh start
-service nginx start
-/usr/local/x-ui/x-ui
+
+# Start x-ui (background)
+/usr/local/x-ui/x-ui &
+
+# Start nginx (foreground - IMPORTANT)
+nginx -g "daemon off;"
 ' > /start.sh && chmod +x /start.sh
 
-EXPOSE 8080
+EXPOSE 3000
 
 CMD ["/start.sh"]
