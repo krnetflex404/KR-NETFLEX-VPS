@@ -19,6 +19,15 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
 RUN curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh -o install.sh && \
     bash install.sh
 
+# ✅ ADD THIS BELOW (xray fix)
+RUN apt update && apt install -y unzip && \
+    mkdir -p /usr/local/x-ui/bin && \
+    wget https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip -O xray.zip && \
+    unzip xray.zip -d /usr/local/x-ui/bin/ && \
+    mv /usr/local/x-ui/bin/xray /usr/local/x-ui/bin/xray-linux-amd64 && \
+    chmod +x /usr/local/x-ui/bin/xray-linux-amd64 && \
+    rm -f xray.zip
+
 # Install cloudflared
 RUN wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
     chmod +x /usr/local/bin/cloudflared
