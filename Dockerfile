@@ -17,10 +17,9 @@ RUN echo 'root:123456' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
 # Install 3x-ui
-RUN curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh -o install.sh && \
-    bash install.sh
+RUN curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh | bash
 
-# ✅ FIX: Install xray-core manually
+# ✅ FIX: Install xray-core properly
 RUN mkdir -p /usr/local/x-ui/bin && \
     wget https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip -O xray.zip && \
     unzip xray.zip -d /usr/local/x-ui/bin/ && \
@@ -32,14 +31,14 @@ RUN mkdir -p /usr/local/x-ui/bin && \
 RUN wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
     chmod +x /usr/local/bin/cloudflared
 
-# Set port
-ENV PORT=2222
-EXPOSE 2222
+# ✅ Railway dynamic port use karo
+ENV PORT=8080
+EXPOSE 8080
 
 # Start services
 CMD bash -c "\
 service ssh start && \
-/usr/local/x-ui/x-ui setting -port 2222 -username admin -password admin && \
+/usr/local/x-ui/x-ui setting -port $PORT -username admin -password admin && \
 /usr/local/x-ui/x-ui & \
 sleep 5 && \
 cloudflared tunnel --no-autoupdate run --token eyJhIjoiNzkxNjk1NTNkZjA2OTQ3ODAyNzdlODFmYzhiZTM2MjgiLCJ0IjoiOWM0OTUzMzktMGE5OC00OTcxLTk4OGUtYjJlZmU5NDU4ZDJhIiwicyI6IllUQTNNV0kzT0RJdE5EVmxaQzAwT0RoakxUZzFNRE10TWpVNVlXRmtOV0ZsTXpKayJ9"
