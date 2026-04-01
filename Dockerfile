@@ -2,18 +2,29 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Install packages
 RUN apt update && apt install -y \
     openssh-server \
-    nginx
+    curl \
+    wget \
+    bash
 
+# SSH setup
 RUN mkdir /var/run/sshd
 RUN echo 'root:123456' | chpasswd
-
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-# Simple webpage
-RUN echo "KR NETFLIX VPS RUNNING" > /var/www/html/index.html
+# Install x-ui (VLESS panel)
+RUN bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
 
-EXPOSE 80 2222
+# Install cloudflared
+RUN wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared
+RUN chmod +x /usr/local/bin/cloudflared
 
-CMD service ssh start && nginx -g 'daemon off;'
+# Expose panel port
+EXPOSE 54321
+
+# Start everything
+CMD service ssh start && \
+    /usr/local/x-ui/x-ui start && \
+    cloudflared tunnel --no-autoupdate run --token YOUR_TOKEN
