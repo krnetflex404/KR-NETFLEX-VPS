@@ -9,17 +9,27 @@ RUN apt update && apt install -y \
     wget \
     unzip \
     bash \
-    ca-certificates
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# SSH setup
+# ---------------- SSH SETUP ----------------
 RUN mkdir /var/run/sshd
-RUN echo 'root:123456' | chpasswd
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-# Install 3x-ui
+# Set root password
+RUN echo 'root:123456' | chpasswd
+
+# Enable root login + password auth
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+RUN sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+# Fix login issue
+RUN sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd
+
+# ---------------- INSTALL 3X-UI ----------------
 RUN curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh | bash
 
-# ✅ FIXED xray-core install (correct method)
+# Fix xray binary (important)
 RUN mkdir -p /usr/local/x-ui/bin && \
     wget https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip -O xray.zip && \
     unzip xray.zip -d /tmp/xray && \
@@ -27,19 +37,20 @@ RUN mkdir -p /usr/local/x-ui/bin && \
     chmod +x /usr/local/x-ui/bin/xray-linux-amd64 && \
     rm -rf /tmp/xray xray.zip
 
-# Install cloudflared
-RUN wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
+# ---------------- CLOUDFLARE ----------------
+RUN wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
+    -O /usr/local/bin/cloudflared && \
     chmod +x /usr/local/bin/cloudflared
 
-# ✅ Railway dynamic port
+# ---------------- PORT ----------------
 ENV PORT=8080
 EXPOSE 8080
 
-# ✅ FINAL START COMMAND (MOST IMPORTANT FIX)
+# ---------------- START ----------------
 CMD bash -c "\
-service ssh start && \
+/usr/sbin/sshd && \
 cd /usr/local/x-ui && \
-./x-ui setting -port $PORT -username admin -password admin && \
+./x-ui setting -port ${PORT} -username admin -password admin && \
 ./x-ui & \
-sleep 5 && \
-cloudflared tunnel --no-autoupdate run --token eyJhIjoiNzkxNjk1NTNkZjA2OTQ3ODAyNzdlODFmYzhiZTM2MjgiLCJ0IjoiOWM0OTUzMzktMGE5OC00OTcxLTk4OGUtYjJlZmU5NDU4ZDJhIiwicyI6IllUQTNNV0kzT0RJdE5EVmxaQzAwT0RoakxUZzFNRE10TWpVNVlXRmtOV0ZsTXpKayJ9"
+sleep 8 && \
+cloudflared tunnel --no-autoupdate run --token YOUR_TOKEN_HERE" eyJhIjoiNzkxNjk1NTNkZjA2OTQ3ODAyNzdlODFmYzhiZTM2MjgiLCJ0IjoiOWM0OTUzMzktMGE5OC00OTcxLTk4OGUtYjJlZmU5NDU4ZDJhIiwicyI6IllUQTNNV0kzT0RJdE5EVmxaQzAwT0RoakxUZzFNRE10TWpVNVlXRmtOV0ZsTXpKayJ9"
