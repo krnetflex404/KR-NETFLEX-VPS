@@ -2,7 +2,6 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install packages
 RUN apt update && apt install -y \
     openssh-server \
     curl \
@@ -12,16 +11,16 @@ RUN apt update && apt install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# ---------------- SSH (UNCHANGED) ----------------
+# SSH (UNCHANGED)
 RUN mkdir /var/run/sshd
 RUN echo 'root:123456' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-# ---------------- Install 3x-ui ----------------
+# Install 3x-ui
 RUN curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh -o install.sh && \
     bash install.sh
 
-# ---------------- FIX: Install xray-core ----------------
+# Fix xray
 RUN mkdir -p /usr/local/x-ui/bin && \
     wget https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip -O xray.zip && \
     unzip xray.zip -d /usr/local/x-ui/bin/ && \
@@ -29,17 +28,15 @@ RUN mkdir -p /usr/local/x-ui/bin && \
     chmod +x /usr/local/x-ui/bin/xray-linux-amd64 && \
     rm -f xray.zip
 
-# ---------------- Install cloudflared ----------------
+# cloudflared
 RUN wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
     chmod +x /usr/local/bin/cloudflared
 
-# Panel port (IMPORTANT: SSH se alag)
 ENV PORT=80
 EXPOSE 80 2222
 
-# ---------------- Start services ----------------
 CMD bash -c "\
-/usr/sbin/sshd -p 2222 && \
+/usr/sbin/sshd -p 2222 & \
 /usr/local/x-ui/x-ui setting -port 80 -username admin -password admin && \
 /usr/local/x-ui/x-ui & \
 sleep 5 && \
