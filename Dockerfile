@@ -30,7 +30,8 @@ RUN mkdir -p /usr/local/x-ui/bin && \
     unzip xray.zip -d /usr/local/x-ui/bin/ && \
     mv /usr/local/x-ui/bin/xray /usr/local/x-ui/bin/xray-linux-amd64 && \
     chmod +x /usr/local/x-ui/bin/xray-linux-amd64 && \
-    rm -f xray.zip
+    rm -f xray.zip && \
+    chmod -R 755 /usr/local/x-ui
 
 # 🔥 IMPORTANT FIX (symlink)
 RUN ln -s /usr/local/x-ui/bin/xray-linux-amd64 /usr/bin/xray
