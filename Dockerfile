@@ -24,7 +24,7 @@ RUN mkdir -p /usr/local/x-ui && \
     chmod +x /usr/local/x-ui/x-ui && \
     rm -f x-ui.tar.gz
 
-# Install xray-core
+# Install xray-core (FINAL FIX)
 RUN mkdir -p /usr/local/x-ui/bin && \
     wget https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip -O xray.zip && \
     unzip xray.zip -d /usr/local/x-ui/bin/ && \
@@ -33,17 +33,12 @@ RUN mkdir -p /usr/local/x-ui/bin && \
     rm -f xray.zip && \
     chmod -R 755 /usr/local/x-ui
 
-# 🔥 IMPORTANT FIX (symlink)
-RUN ln -s /usr/local/x-ui/bin/xray-linux-amd64 /usr/bin/xray
-
-# Install cloudflared
+# Cloudflared
 RUN wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
     chmod +x /usr/local/bin/cloudflared
 
-# Expose ports
-EXPOSE 2222 80
+EXPOSE 2222 2053
 
-# Start services
 CMD bash -c "\
 /usr/sbin/sshd -D -p 2222 & \
 sleep 3 && \
