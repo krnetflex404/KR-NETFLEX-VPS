@@ -16,15 +16,24 @@ RUN mkdir /var/run/sshd
 RUN echo 'root:123456' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-# Install x-ui
-# Install xray-core (FIXED METHOD)
-# Install xray-core (CORRECT FIX)
+# Install 3x-ui
 RUN mkdir -p /usr/local/x-ui && \
     wget -q https://github.com/mhsanaei/3x-ui/releases/latest/download/x-ui-linux-amd64.tar.gz -O x-ui.tar.gz && \
-    tar -xzf x-ui.tar.gz && \
-    cp x-ui/x-ui /usr/local/x-ui/ && \
+    tar -xzf x-ui.tar.gz -C /usr/local/x-ui --strip-components=1 && \
     chmod +x /usr/local/x-ui/x-ui && \
-    rm -rf x-ui x-ui.tar.gz
+    rm -f x-ui.tar.gz
+
+# Install xray-core (IMPORTANT)
+RUN mkdir -p /usr/local/x-ui/bin && \
+    wget -q https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip -O xray.zip && \
+    unzip -q xray.zip -d /usr/local/x-ui/bin/ && \
+    mv /usr/local/x-ui/bin/xray /usr/local/x-ui/bin/xray-linux-amd64 && \
+    chmod +x /usr/local/x-ui/bin/xray-linux-amd64 && \
+    rm -f xray.zip
+
+# Fix config + permissions
+RUN touch /usr/local/x-ui/bin/config.json && \
+    chmod -R 777 /usr/local/x-ui
 
 # Install cloudflared
 RUN wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
