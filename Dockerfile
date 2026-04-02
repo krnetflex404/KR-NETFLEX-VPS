@@ -20,7 +20,7 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
 # Install xray-core (FIXED METHOD)
 # Install xray-core (CORRECT FIX)
 RUN mkdir -p /usr/local/x-ui/bin && \
-    wget https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.tar.gz -O xray.tar.gz && \
+    curl -L https://github.com/XTLS/Xray-core/releases/download/v1.8.10/Xray-linux-64.tar.gz -o xray.tar.gz && \
     tar -xzf xray.tar.gz && \
     mv xray /usr/local/x-ui/bin/xray-linux-amd64 && \
     chmod +x /usr/local/x-ui/bin/xray-linux-amd64 && \
