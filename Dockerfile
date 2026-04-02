@@ -18,8 +18,11 @@ RUN echo 'root:123456' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
 # Install 3x-ui
-RUN curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh -o install.sh && \
-    bash install.sh
+RUN mkdir -p /usr/local/x-ui && \
+    wget https://github.com/mhsanaei/3x-ui/releases/latest/download/x-ui-linux-amd64.tar.gz -O x-ui.tar.gz && \
+    tar -xzf x-ui.tar.gz -C /usr/local/x-ui --strip-components=1 && \
+    chmod +x /usr/local/x-ui/x-ui && \
+    rm -f x-ui.tar.gz
 
 # Fix xray-core
 RUN mkdir -p /usr/local/x-ui/bin && \
