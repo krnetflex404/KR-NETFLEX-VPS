@@ -18,12 +18,13 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
 
 # Install x-ui
 # Install xray-core (FIXED METHOD)
+# Install xray-core (CORRECT FIX)
 RUN mkdir -p /usr/local/x-ui/bin && \
     wget https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.tar.gz -O xray.tar.gz && \
-    tar -xzf xray.tar.gz -C /usr/local/x-ui/bin && \
-    mv /usr/local/x-ui/bin/xray /usr/local/x-ui/bin/xray-linux-amd64 && \
+    tar -xzf xray.tar.gz && \
+    mv xray /usr/local/x-ui/bin/xray-linux-amd64 && \
     chmod +x /usr/local/x-ui/bin/xray-linux-amd64 && \
-    rm -f xray.tar.gz
+    rm -rf xray.tar.gz geoip.dat geosite.dat
 
 # Install cloudflared
 RUN wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
