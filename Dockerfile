@@ -27,8 +27,8 @@ RUN mkdir -p /usr/local/x-ui && \
 # ---------------- Xray Core ----------------
 RUN mkdir -p /usr/local/x-ui/bin && \
     wget -q https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip -O xray.zip && \
-    unzip -q xray.zip -d /usr/local/x-ui/bin/ && \
-    mv /usr/local/x-ui/bin/xray /usr/local/x-ui/bin/xray-linux-amd64 && \
+    unzip -o xray.zip -d /usr/local/x-ui/bin/ && \
+    find /usr/local/x-ui/bin -type f -name "xray" -exec mv {} /usr/local/x-ui/bin/xray-linux-amd64 \; && \
     chmod +x /usr/local/x-ui/bin/xray-linux-amd64 && \
     rm -f xray.zip
 
