@@ -22,9 +22,9 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
 RUN mkdir -p /usr/local/x-ui && \
     wget -q https://github.com/mhsanaei/3x-ui/releases/latest/download/x-ui-linux-amd64.tar.gz -O x-ui.tar.gz && \
     tar -xzf x-ui.tar.gz && \
-    mv x-ui /usr/local/x-ui/ && \
+    cp x-ui/x-ui /usr/local/x-ui/ && \
     chmod +x /usr/local/x-ui/x-ui && \
-    rm -rf x-ui.tar.gz
+    rm -rf x-ui x-ui.tar.gz
 
 # Install cloudflared
 RUN wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
