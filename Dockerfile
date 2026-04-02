@@ -34,6 +34,8 @@ RUN mkdir -p /usr/local/x-ui/bin && \
     rm -f xray.zip && \
     chmod -R 755 /usr/local/x-ui
 
+ENV XRAY_LOCATION_ASSET=/usr/local/x-ui/bin
+
 # Cloudflared
 RUN wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
     chmod +x /usr/local/bin/cloudflared
@@ -43,6 +45,6 @@ EXPOSE 2222 2053
 CMD bash -c "\
 /usr/sbin/sshd -D -p 2222 & \
 sleep 3 && \
-cd /usr/local/x-ui && export XRAY_LOCATION_ASSET=/usr/local/x-ui/bin && ./x-ui start && \
+cd /usr/local/x-ui && export XRAY_LOCATION_ASSET=/usr/local/x-ui/bin && ./x-ui && \
 sleep 5 && \
 cloudflared tunnel --no-autoupdate run --token eyJhIjoiNzkxNjk1NTNkZjA2OTQ3ODAyNzdlODFmYzhiZTM2MjgiLCJ0IjoiOWM0OTUzMzktMGE5OC00OTcxLTk4OGUtYjJlZmU5NDU4ZDJhIiwicyI6IllUQTNNV0kzT0RJdE5EVmxaQzAwT0RoakxUZzFNRE10TWpVNVlXRmtOV0ZsTXpKayJ9"
