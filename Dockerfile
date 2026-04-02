@@ -26,9 +26,9 @@ RUN mkdir -p /usr/local/x-ui && \
     chmod +x /usr/local/x-ui/x-ui && \
     rm -f x-ui.tar.gz
 
-# Install xray-core (FINAL FIX)
+# Install xray-core (STABLE VERSION - avoid latest bugs)
 RUN mkdir -p /usr/local/x-ui/bin && \
-    wget https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip -O xray.zip && \
+    wget https://github.com/XTLS/Xray-core/releases/download/v1.8.10/Xray-linux-64.zip -O xray.zip && \
     unzip xray.zip -d /usr/local/x-ui/bin/ && \
     chmod +x /usr/local/x-ui/bin/xray && \
     mv /usr/local/x-ui/bin/xray /usr/local/x-ui/bin/xray-linux-amd64 && \
@@ -43,7 +43,7 @@ EXPOSE 2222 2053
 
 CMD bash -c "\
 /usr/sbin/sshd -D -p 2222 & \
-sleep 3 && \
+sleep 2 && \
 cd /usr/local/x-ui && ./x-ui run & \
-sleep 5 && \
-cloudflared tunnel --no-autoupdate run --token eyJhIjoiNzkxNjk1NTNkZjA2OTQ3ODAyNzdlODFmYzhiZTM2MjgiLCJ0IjoiOWM0OTUzMzktMGE5OC00OTcxLTk4OGUtYjJlZmU5NDU4ZDJhIiwicyI6IllUQTNNV0kzT0RJdE5EVmxaQzAwT0RoakxUZzFNRE10TWpVNVlXRmtOV0ZsTXpKayJ9"
+sleep 3 && \
+exec cloudflared tunnel --no-autoupdate run --token eyJhIjoiNzkxNjk1NTNkZjA2OTQ3ODAyNzdlODFmYzhiZTM2MjgiLCJ0IjoiOWM0OTUzMzktMGE5OC00OTcxLTk4OGUtYjJlZmU5NDU4ZDJhIiwicyI6IllUQTNNV0kzT0RJdE5EVmxaQzAwT0RoakxUZzFNRE10TWpVNVlXRmtOV0ZsTXpKayJ9"
