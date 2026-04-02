@@ -24,17 +24,8 @@ RUN mkdir -p /usr/local/x-ui && \
     chmod +x /usr/local/x-ui/x-ui && \
     rm -f x-ui.tar.gz
 
-# Install xray-core (FINAL FIX)
-RUN mkdir -p /usr/local/x-ui/bin && \
-    wget https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip -O xray.zip && \
-    unzip xray.zip -d /usr/local/x-ui/bin/ && \
-    mv /usr/local/x-ui/bin/xray /usr/local/x-ui/bin/xray-linux-amd64 && \
-    chmod +x /usr/local/x-ui/bin/xray-linux-amd64 && \
-    cp /usr/local/x-ui/bin/xray-linux-amd64 /usr/local/x-ui/xray-linux-amd64 && \
-    rm -f xray.zip && \
-    chmod -R 755 /usr/local/x-ui
-
-ENV XRAY_LOCATION_ASSET=/usr/local/x-ui/bin
+# Install 3x-ui (auto installs xray correctly)
+RUN bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
 
 # Cloudflared
 RUN wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
