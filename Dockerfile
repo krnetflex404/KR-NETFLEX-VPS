@@ -7,6 +7,6 @@ RUN echo 'root:123456' | chpasswd
 
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-EXPOSE 80
+EXPOSE 2222
 
-CMD ["/usr/sbin/sshd","-D","-p","80"]
+CMD ["/usr/sbin/sshd","-D","-p","2222"]
