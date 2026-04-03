@@ -51,7 +51,7 @@ def create():
 
     return jsonify({
         "ip": "metro.proxy.rlwy.net",
-        "port": port,
+        "port": 34366,
         "user": "root",
         "pass": "123456"
     })
