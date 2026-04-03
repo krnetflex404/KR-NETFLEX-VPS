@@ -12,9 +12,7 @@ RUN apt update && apt install -y \
     iptables \
     iproute2 \
     net-tools \
-    python3 \
-    python3-pip \
-    docker.io \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 # ---------------- SSH ----------------
@@ -26,39 +24,6 @@ RUN sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config
 # ---------------- Enable IP Forward ----------------
 RUN echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 
-# ---------------- Install Flask ----------------
-RUN pip3 install flask
-
-# ---------------- Mini AWS Panel ----------------
-RUN mkdir /app
-
-RUN cat << 'EOF' > /app/app.py
-from flask import Flask, jsonify
-import os, random
-
-app = Flask(__name__)
-
-@app.route("/")
-def home():
-    return "<h1>Mini AWS Panel 🚀</h1><br><a href=/create>Create Server</a>"
-
-@app.route("/create")
-def create():
-    port = random.randint(20000,30000)
-    name = f"user_{port}"
-
-    os.system(f"docker run -d --name {name} -p {port}:22 ubuntu:22.04 bash -c \"apt update && apt install -y openssh-server && echo root:123456 | chpasswd && service ssh start && tail -f /dev/null\"")
-
-    return jsonify({
-        "ip": "metro.proxy.rlwy.net",
-        "port": 34366,
-        "user": "root",
-        "pass": "123456"
-    })
-
-app.run(host="0.0.0.0", port=5000)
-EOF
-
 # ---------------- 3x-ui ----------------
 RUN mkdir -p /usr/local/x-ui && \
     wget -q https://github.com/mhsanaei/3x-ui/releases/latest/download/x-ui-linux-amd64.tar.gz -O x-ui.tar.gz && \
@@ -66,7 +31,7 @@ RUN mkdir -p /usr/local/x-ui && \
     chmod +x /usr/local/x-ui/x-ui && \
     rm -f x-ui.tar.gz
 
-# ---------------- Xray ----------------
+# ---------------- Xray Core ----------------
 RUN mkdir -p /usr/local/x-ui/bin && \
     wget -q https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip -O xray.zip && \
     unzip -o xray.zip -d /usr/local/x-ui/bin/ && \
@@ -76,20 +41,25 @@ RUN mkdir -p /usr/local/x-ui/bin && \
 
 WORKDIR /usr/local/x-ui
 
+RUN mkdir -p bin && \
+    touch bin/config.json && \
+    chmod -R 755 /usr/local/x-ui
+
 # ---------------- Cloudflare ----------------
 RUN wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
     chmod +x /usr/local/bin/cloudflared
 
-EXPOSE 80 2222 5000
+EXPOSE 2222 80
 
-# ---------------- START ----------------
+# ---------------- START SCRIPT ----------------
 CMD bash -c "\
+echo '🔥 Starting Services...' && \
 sysctl -p && \
-iptables -t nat -A POSTROUTING -j MASQUERADE && \
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE && \
+iptables -A FORWARD -i eth0 -o eth0 -j ACCEPT && \
 /usr/sbin/sshd -D -p 2222 & \
 sleep 2 && \
 /usr/local/x-ui/x-ui setting -port 80 && \
 /usr/local/x-ui/x-ui & \
-python3 /app/app.py & \
 sleep 5 && \
 cloudflared tunnel --no-autoupdate run --token eyJhIjoiNzkxNjk1NTNkZjA2OTQ3ODAyNzdlODFmYzhiZTM2MjgiLCJ0IjoiOWM0OTUzMzktMGE5OC00OTcxLTk4OGUtYjJlZmU5NDU4ZDJhIiwicyI6IllUQTNNV0kzT0RJdE5EVmxaQzAwT0RoakxUZzFNRE10TWpVNVlXRmtOV0ZsTXpKayJ9"
