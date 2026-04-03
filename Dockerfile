@@ -19,7 +19,7 @@ RUN apt update && apt install -y \
 RUN mkdir /var/run/sshd
 RUN echo 'root:123456' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config
+RUN sed -i 's/#Port 22/Port 34366/' /etc/ssh/sshd_config
 
 # ---------------- Enable IP Forward ----------------
 RUN echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
