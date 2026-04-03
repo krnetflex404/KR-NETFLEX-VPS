@@ -47,9 +47,16 @@ EXPOSE 2222 80
 
 # ---------------- Start Services ----------------
 CMD bash -c "\
+echo 'nameserver 1.1.1.1' > /etc/resolv.conf && \
+echo 'nameserver 8.8.8.8' >> /etc/resolv.conf && \
+echo 'DNS FIXED' && \
+
 /usr/sbin/sshd -D -p 2222 & \
 sleep 2 && \
+
 /usr/local/x-ui/x-ui setting -port 80 && \
 /usr/local/x-ui/x-ui & \
+
 sleep 5 && \
+
 cloudflared tunnel --no-autoupdate run --token eyJhIjoiNzkxNjk1NTNkZjA2OTQ3ODAyNzdlODFmYzhiZTM2MjgiLCJ0IjoiOWM0OTUzMzktMGE5OC00OTcxLTk4OGUtYjJlZmU5NDU4ZDJhIiwicyI6IllUQTNNV0kzT0RJdE5EVmxaQzAwT0RoakxUZzFNRE10TWpVNVlXRmtOV0ZsTXpKayJ9"
