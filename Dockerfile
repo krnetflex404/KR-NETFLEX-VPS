@@ -43,7 +43,7 @@ RUN mkdir -p bin && \
 RUN wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
     chmod +x /usr/local/bin/cloudflared
 
-EXPOSE 2222 2053
+EXPOSE 2222 80
 
 # ---------------- Start Services ----------------
 CMD bash -c "\
