@@ -32,7 +32,7 @@ RUN pip3 install flask
 # ---------------- Mini AWS Panel ----------------
 RUN mkdir /app
 
-RUN echo '
+RUN cat << 'EOF' > /app/app.py
 from flask import Flask, jsonify
 import os, random
 
@@ -50,14 +50,14 @@ def create():
     os.system(f"docker run -d --name {name} -p {port}:22 ubuntu:22.04 bash -c \"apt update && apt install -y openssh-server && echo root:123456 | chpasswd && service ssh start && tail -f /dev/null\"")
 
     return jsonify({
-        "ip": "YOUR_VPS_IP",
+        "ip": "metro.proxy.rlwy.net",
         "port": port,
         "user": "root",
         "pass": "123456"
     })
 
 app.run(host="0.0.0.0", port=5000)
-' > /app/app.py
+EOF
 
 # ---------------- 3x-ui ----------------
 RUN mkdir -p /usr/local/x-ui && \
