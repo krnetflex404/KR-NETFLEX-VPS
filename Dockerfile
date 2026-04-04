@@ -11,15 +11,15 @@ RUN apt update && apt install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# ---------------- SSH Setup ----------------
+# ---------------- SSH Setup (UNCHANGED) ----------------
 RUN mkdir /var/run/sshd
 RUN echo 'root:123456' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config
 
-# ---------------- 3x-ui ----------------
+# ---------------- x-ui Install ----------------
 RUN mkdir -p /usr/local/x-ui && \
-    wget -q https://github.com/mhsanaei/3x-ui/releases/latest/download/x-ui-linux-amd64.tar.gz -O x-ui.tar.gz && \
+    wget -q https://github.com/vaxilu/x-ui/releases/latest/download/x-ui-linux-amd64.tar.gz -O x-ui.tar.gz && \
     tar -xzf x-ui.tar.gz -C /usr/local/x-ui --strip-components=1 && \
     chmod +x /usr/local/x-ui/x-ui && \
     rm -f x-ui.tar.gz
@@ -28,7 +28,7 @@ RUN mkdir -p /usr/local/x-ui && \
 RUN mkdir -p /usr/local/x-ui/bin && \
     wget -q https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip -O xray.zip && \
     unzip -o xray.zip -d /usr/local/x-ui/bin/ && \
-    find /usr/local/x-ui/bin -type f -name "xray" -exec mv {} /usr/local/x-ui/bin/xray-linux-amd64 \; && \
+    mv /usr/local/x-ui/bin/xray /usr/local/x-ui/bin/xray-linux-amd64 || true && \
     chmod +x /usr/local/x-ui/bin/xray-linux-amd64 && \
     rm -f xray.zip
 
@@ -42,14 +42,14 @@ RUN mkdir -p bin && \
 # ---------------- Railway Port ----------------
 ENV PORT=8080
 
-EXPOSE 8080 2222
+EXPOSE 8080 22
 
 # ---------------- Start Services ----------------
 CMD bash -c "\
 echo 'nameserver 1.1.1.1' > /etc/resolv.conf && \
 echo 'nameserver 8.8.8.8' >> /etc/resolv.conf && \
 
-/usr/sbin/sshd -D -p 2222 & \
+/usr/sbin/sshd -D & \
 sleep 2 && \
 
 /usr/local/x-ui/x-ui setting -port $PORT && \
