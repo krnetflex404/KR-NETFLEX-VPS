@@ -1,3 +1,4 @@
+https://github.com/username/repo/blob/main/fly.toml
 app = "kr-vpn"
 
 [build]
