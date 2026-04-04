@@ -54,7 +54,7 @@ echo 'DNS FIXED' && \
 /usr/sbin/sshd -D -p 2222 & \
 sleep 2 && \
 
-/usr/local/x-ui/x-ui setting -port 80 && \
+/usr/local/x-ui/x-ui setting -port 8080 && \
 /usr/local/x-ui/x-ui & \
 
 sleep 5 && \
