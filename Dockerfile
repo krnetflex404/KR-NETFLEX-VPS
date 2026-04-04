@@ -9,7 +9,14 @@ RUN apt update && apt install -y \
     wget \
     unzip \
     ca-certificates \
+    tzdata \
     && rm -rf /var/lib/apt/lists/*
+
+# ---------------- Set Timezone ----------------
+ENV TZ=Asia/Kolkata
+
+RUN ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
 
 # ---------------- SSH Setup (UNCHANGED) ----------------
 RUN mkdir /var/run/sshd
