@@ -12,26 +12,26 @@ RUN apt update && apt install -y \
     tzdata \
     && rm -rf /var/lib/apt/lists/*
 
-# ---------------- Timezone fix ----------------
+# ---------------- Timezone ----------------
 ENV TZ=Asia/Kolkata
 RUN ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata
 
-# ---------------- SSH Setup (UNCHANGED) ----------------
+# ---------------- SSH ----------------
 RUN mkdir /var/run/sshd
 RUN echo 'root:123456' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config
 
-# ---------------- Install 3x-ui ----------------
-RUN bash -c "$(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)"
+# ---------------- Install 3x-ui (non-interactive fix) ----------------
+RUN curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh | bash -s -- -y
 
 # ---------------- Railway Port ----------------
 ENV PORT=8080
 
 EXPOSE 8080 22
 
-# ---------------- Start Services ----------------
+# ---------------- Start ----------------
 CMD bash -c "\
 echo 'nameserver 1.1.1.1' > /etc/resolv.conf && \
 echo 'nameserver 8.8.8.8' >> /etc/resolv.conf && \
@@ -40,6 +40,6 @@ echo 'nameserver 8.8.8.8' >> /etc/resolv.conf && \
 sleep 3 && \
 
 x-ui setting -port 8080 && \
-x-ui start && \
+/usr/local/x-ui/x-ui & \
 
 tail -f /dev/null"
