@@ -48,7 +48,6 @@ EXPOSE 8080 2222
 CMD bash -c "\
 echo 'nameserver 1.1.1.1' > /etc/resolv.conf && \
 echo 'nameserver 8.8.8.8' >> /etc/resolv.conf && \
-echo 'DNS FIXED' && \
 
 /usr/sbin/sshd -D -p 2222 & \
 sleep 2 && \
