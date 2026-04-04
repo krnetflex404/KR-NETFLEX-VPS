@@ -28,15 +28,14 @@ RUN mkdir -p /usr/local/x-ui && \
 RUN mkdir -p /usr/local/x-ui/bin && \
     wget -q https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip -O xray.zip && \
     unzip -o xray.zip -d /usr/local/x-ui/bin/ && \
-    mv /usr/local/x-ui/bin/xray /usr/local/x-ui/bin/xray-linux-amd64 || true && \
-    chmod +x /usr/local/x-ui/bin/xray-linux-amd64 && \
+    chmod +x /usr/local/x-ui/bin/xray && \
     rm -f xray.zip
 
 # ---------------- Fix config ----------------
 WORKDIR /usr/local/x-ui
 
 RUN mkdir -p bin && \
-    touch bin/config.json && \
+    echo '{}' > bin/config.json && \
     chmod -R 755 /usr/local/x-ui
 
 # ---------------- Railway Port ----------------
@@ -52,5 +51,7 @@ echo 'nameserver 8.8.8.8' >> /etc/resolv.conf && \
 /usr/sbin/sshd -D -p 2222 & \
 sleep 2 && \
 
-/usr/local/x-ui/x-ui start && \
+/usr/local/x-ui/x-ui setting -port 8080 && \
+/usr/local/x-ui/x-ui & \
+
 tail -f /dev/null"
