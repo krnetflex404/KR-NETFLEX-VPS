@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# ---------------- Install packages ----------------
+# Install packages
 RUN apt update && apt install -y \
     openssh-server \
     curl \
@@ -11,7 +11,7 @@ RUN apt update && apt install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# ---------------- SSH Setup ----------------
+# ---------------- SSH ----------------
 RUN mkdir /var/run/sshd
 RUN echo 'root:123456' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
@@ -39,18 +39,17 @@ RUN mkdir -p bin && \
     touch bin/config.json && \
     chmod -R 755 /usr/local/x-ui
 
-# ---------------- Railway Port ----------------
-ENV PORT=8080
+# ---------------- Cloudflare ----------------
+RUN wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
+    chmod +x /usr/local/bin/cloudflared
 
-EXPOSE 8080 2222
+EXPOSE 2222 80
 
 # ---------------- Start Services ----------------
 CMD bash -c "\
-echo 'nameserver 1.1.1.1' > /etc/resolv.conf && \
-echo 'nameserver 8.8.8.8' >> /etc/resolv.conf && \
-
 /usr/sbin/sshd -D -p 2222 & \
 sleep 2 && \
-
-/usr/local/x-ui/x-ui setting -port $PORT && \
-/usr/local/x-ui/x-ui"
+/usr/local/x-ui/x-ui setting -port 80 && \
+/usr/local/x-ui/x-ui & \
+sleep 5 && \
+cloudflared tunnel --no-autoupdate run --token eyJhIjoiNzkxNjk1NTNkZjA2OTQ3ODAyNzdlODFmYzhiZTM2MjgiLCJ0IjoiOWM0OTUzMzktMGE5OC00OTcxLTk4OGUtYjJlZmU5NDU4ZDJhIiwicyI6IllUQTNNV0kzT0RJdE5EVmxaQzAwT0RoakxUZzFNRE10TWpVNVlXRmtOV0ZsTXpKayJ9"
