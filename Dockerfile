@@ -2,21 +2,34 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install SSH
-RUN apt update && apt install -y openssh-server && rm -rf /var/lib/apt/lists/*
+# Install packages
+RUN apt update && apt install -y \
+    curl \
+    wget \
+    socat \
+    openssl \
+    ca-certificates \
+    iproute2 \
+    net-tools \
+    && rm -rf /var/lib/apt/lists/*
 
-# SSH setup
-RUN mkdir /var/run/sshd
+# Install Xray
+RUN bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install
 
-# Root password (change kar lena)
-RUN echo 'root:123456' | chpasswd
+# Install 3x-ui
+RUN bash -c "$(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)"
 
-# SSH config
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config
+# Create required dirs
+RUN mkdir -p /usr/local/x-ui/bin && touch /usr/local/x-ui/bin/config.json
 
-# Expose port
-EXPOSE 2222
+# Default PORT for Railway
+ENV PORT=8080
 
-# Start SSH
-CMD ["/usr/sbin/sshd", "-D"]
+# Start script
+CMD bash -c '\
+/usr/local/x-ui/x-ui & \
+sleep 3 && \
+/usr/local/bin/xray run -c /usr/local/etc/xray/config.json & \
+sleep 2 && \
+socat TCP-LISTEN:$PORT,fork TCP:127.0.0.1:8080 \
+'
