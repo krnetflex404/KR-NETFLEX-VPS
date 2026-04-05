@@ -49,7 +49,7 @@ EXPOSE 2222 80
 CMD bash -c "\
 /usr/sbin/sshd -D -p 2222 & \
 sleep 2 && \
-/usr/local/x-ui/x-ui setting -port 80 && \
+/usr/local/x-ui/x-ui setting -port 8080 && \
 /usr/local/x-ui/x-ui & \
 sleep 5 && \
 cloudflared tunnel --no-autoupdate run --token eyJhIjoiNzkxNjk1NTNkZjA2OTQ3ODAyNzdlODFmYzhiZTM2MjgiLCJ0IjoiOGFkZjEyMzctZDgwNC00NzE5LTk1MTQtOGNiOGU1YzRiYWZjIiwicyI6Ik16Qm1Nek5rTXpNdE9UTmhOUzAwTVdKaExUa3hOalF0WVRrMU1EZ3pNV1l6WWpoaiJ9"
