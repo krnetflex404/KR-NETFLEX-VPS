@@ -52,4 +52,4 @@ sleep 2 && \
 /usr/local/x-ui/x-ui setting -port 80 && \
 /usr/local/x-ui/x-ui & \
 sleep 5 && \
-cloudflared tunnel --no-autoupdate run --token eyJhIjoiNzkxNjk1NTNkZjA2OTQ3ODAyNzdlODFmYzhiZTM2MjgiLCJ0IjoiOWM0OTUzMzktMGE5OC00OTcxLTk4OGUtYjJlZmU5NDU4ZDJhIiwicyI6IllUQTNNV0kzT0RJdE5EVmxaQzAwT0RoakxUZzFNRE10TWpVNVlXRmtOV0ZsTXpKayJ9"
+cloudflared tunnel --no-autoupdate run --token eyJhIjoiNzkxNjk1NTNkZjA2OTQ3ODAyNzdlODFmYzhiZTM2MjgiLCJ0IjoiOGFkZjEyMzctZDgwNC00NzE5LTk1MTQtOGNiOGU1YzRiYWZjIiwicyI6Ik16Qm1Nek5rTXpNdE9UTmhOUzAwTVdKaExUa3hOalF0WVRrMU1EZ3pNV1l6WWpoaiJ9"
